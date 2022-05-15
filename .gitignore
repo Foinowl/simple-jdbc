@@ -1,0 +1,21 @@
+# Default ignored files
+/shelf/
+
+
+/target
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+out/
+.idea/
+*.idea/
+.idea
+.idea_modules/
+*.iml
+*.ipr
+*.iws
+
+db.iml
