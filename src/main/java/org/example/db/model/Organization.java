@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public class Organization {
+  private Long id;
 
   public Organization(String title) {
     this.title = title;
@@ -27,6 +28,14 @@ public class Organization {
 
   public void setEmployees(Set<Employee> employees) {
     this.employees = employees;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(final Long id) {
+    this.id = id;
   }
 
   @Override

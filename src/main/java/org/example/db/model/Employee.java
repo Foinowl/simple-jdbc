@@ -1,6 +1,9 @@
 package org.example.db.model;
 
 public class Employee {
+  private Long id;
+
+
   private String name;
   private Salary salary;
 
@@ -18,5 +21,13 @@ public class Employee {
 
   public void setSalary(Salary salary) {
     this.salary = salary;
+  }
+
+  public void setId(final Long id) {
+    this.id = id;
+  }
+
+  public Long getId() {
+    return id;
   }
 }
