@@ -45,7 +45,7 @@ public class CommandFactoryImpl implements CommandFactory {
     }
 
 
-  public static class ExitCommand implements Command {
+    public static class ExitCommand implements Command {
 
         public static String NAME = "exit";
 
@@ -138,9 +138,9 @@ public class CommandFactoryImpl implements CommandFactory {
 
         @Override
         public void execute() {
-            storageService.listAll().stream().forEach(e -> {
-                System.out.println(String.format("%s %d", e.getName(), e.getSalary().getValue().longValueExact()));
-            });
+            storageService.listAll()
+                .forEach(e ->
+                    System.out.printf("%s %d%n", e.getName(), e.getSalary().getValue().longValueExact()));
         }
     }
 
@@ -152,10 +152,11 @@ public class CommandFactoryImpl implements CommandFactory {
         }
     }
 
-    public static class GetCommand implements Command{
+    public static class GetCommand implements Command {
         public static String NAME = "get";
 
         private final String name;
+
         private final StorageService storageService;
 
         public GetCommand(final String name, final StorageService storageService) {
@@ -173,14 +174,15 @@ public class CommandFactoryImpl implements CommandFactory {
 
         @Override
         public Command createCommand(Params params) {
-            return new GetCommand(params.getArgs()[0] ,PersistentStorage.getInstance());
+            return new GetCommand(params.getArgs()[0], PersistentStorage.getInstance());
         }
     }
 
-    public static class DeleteCommand implements Command{
+    public static class DeleteCommand implements Command {
         public static String NAME = "delete";
 
         private final String name;
+
         private final StorageService storageService;
 
         public DeleteCommand(final String name, final StorageService storageService) {
@@ -198,13 +200,15 @@ public class CommandFactoryImpl implements CommandFactory {
 
         @Override
         public Command createCommand(Params params) {
-            return new DeleteCommand(params.getArgs()[0] ,PersistentStorage.getInstance());
+            return new DeleteCommand(params.getArgs()[0], PersistentStorage.getInstance());
         }
     }
 
-    public static class UpdateCommand implements Command{
+    public static class UpdateCommand implements Command {
         public static String NAME = "update";
+
         private final Employee employee;
+
         private final StorageService storageService;
 
         public UpdateCommand(final Employee employee, final StorageService storageService) {
@@ -230,15 +234,17 @@ public class CommandFactoryImpl implements CommandFactory {
             Salary salary = new Salary();
             salary.setValue(BigDecimal.valueOf(Long.parseLong(args[2])));
             employee.setSalary(salary);
-            return new UpdateCommand(employee,PersistentStorage.getInstance());
+            return new UpdateCommand(employee, PersistentStorage.getInstance());
         }
     }
 
-    public static class FindCommand implements Command{
+    public static class FindCommand implements Command {
         public static String NAME = "find";
+
         private final StorageService storageService;
 
         private final String title;
+
         public FindCommand(final StorageService storageService, final String title) {
             this.storageService = storageService;
             this.title = title;

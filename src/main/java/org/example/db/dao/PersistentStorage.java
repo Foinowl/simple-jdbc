@@ -3,16 +3,9 @@ package org.example.db.dao;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashSet;
 import java.util.Set;
-import org.example.db.mappers.EmployeeMapper;
-import org.example.db.mappers.OrganizationMapper;
-import org.example.db.mappers.RowMapper;
-import org.example.db.mappers.SalaryMapper;
 import org.example.db.model.Employee;
 import org.example.db.model.Organization;
 import org.example.db.model.Salary;
@@ -39,12 +32,7 @@ public class PersistentStorage implements StorageService {
 
     @Override
     public Organization findOrganization(final String title) {
-        try {
-            return TransactionWrapper.getInstance().findOrganization(title);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        return TransactionWrapper.getInstance().findOrganization(title);
     }
 
     @Override
@@ -70,13 +58,13 @@ public class PersistentStorage implements StorageService {
     public static class TransactionWrapper {
         private static final TransactionWrapper instance = new TransactionWrapper();
 
-        private final RowMapper<Salary> salaryRowMapper = new SalaryMapper();
+        private final Connection connection;
 
-        private final RowMapper<Organization> organizationRowMapper = new OrganizationMapper();
-
-        private final RowMapper<Employee> employeeRowMapper = new EmployeeMapper();
-
-        private Connection connection;
+        private final Callback<Employee> callbackEmployee = (ResultSet rs, Employee employee) -> {
+            Salary salary = findSalary(rs.getLong("salary_id"));
+            employee.setSalary(salary);
+            return employee;
+        };
 
         private TransactionWrapper() {
             String url = "jdbc:postgresql://localhost:5433/postgres";
@@ -96,31 +84,13 @@ public class PersistentStorage implements StorageService {
         }
 
         public Set<Employee> list() {
-            Set<Employee> result = new HashSet<>();
+
+            String getEmployees = "select id as empl_id, ename as empl_title, salary_id, org_id from employees";
+            Set<Employee> result;
 
             try {
-                PreparedStatement statement =
-                    connection.prepareStatement(
-                        "select id as empl_id, ename as empl_title, salary_id, org_id from employees");
-                PreparedStatement statement1 = connection.prepareStatement(
-                    "select id as salary_id, value as salary_value from salary where id = ?");
-                ResultSet resultSet = statement.executeQuery();
-
-                while (resultSet.next()) {
-
-                    Employee employee = employeeRowMapper.mapRow(resultSet);
-
-                    statement1.setLong(1, resultSet.getLong("salary_id"));
-                    ResultSet salaryResultSet = statement1.executeQuery();
-
-                    Salary salary = null;
-                    while (salaryResultSet.next()) {
-                        salary = salaryRowMapper.mapRow(salaryResultSet);
-                    }
-                    employee.setSalary(salary);
-
-                    result.add(employee);
-                }
+                result =
+                    JdbcTemplate.select(connection, getEmployees, UtilsHandler.SET_EMPLOYEES_HANDLER, callbackEmployee);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -129,69 +99,53 @@ public class PersistentStorage implements StorageService {
         }
 
         public void add(String orgTitle, String emplName, BigDecimal empSalary) throws SQLException {
-            PreparedStatement addEmployee =
-                connection.prepareStatement("insert into employees(ename, salary_id, org_id) values (?,?,?)",
-                    Statement.RETURN_GENERATED_KEYS);
-            Salary salary = addSalary(empSalary);
 
-            Organization organization = addOrganization(orgTitle);
-            addEmployee.setString(1, emplName);
-            addEmployee.setLong(2, salary.getId());
-            addEmployee.setLong(3, organization.getId());
-
-            addEmployee.execute();
-        }
-
-        private Salary addSalary(BigDecimal salary) {
-            Salary salary1 = null;
             try {
-                PreparedStatement addSalary = connection.prepareStatement(
-                    "insert into salary(value) values(?) returning id as salary_id, value as salary_value",
-                    Statement.RETURN_GENERATED_KEYS);
+                Salary salary = addSalary(empSalary);
 
-                addSalary.setBigDecimal(1, salary);
-
-                try {
-                    addSalary.execute();
-                    ResultSet resultSalary = addSalary.getGeneratedKeys();
-                    while (resultSalary.next()) {
-                        salary1 = salaryRowMapper.mapRow(resultSalary);
-                    }
-                } catch (PSQLException e) {
-                    salary1 = findSalary(salary);
-                }
+                Organization organization = addOrganization(orgTitle);
+                JdbcTemplate.insert(connection, "insert into employees(ename, salary_id, org_id) values (?,?,?)",
+                    (rs, o) -> null, (r, p) -> null, emplName, salary.getId(), organization.getId());
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        private Salary addSalary(BigDecimal salary) {
+            String insertSalarySql =
+                "insert into salary(value) values(?) returning id as salary_id, value as salary_value";
+
+            Salary salary1;
+            try {
+                salary1 = JdbcTemplate.insert(connection, insertSalarySql, UtilsHandler.ONE_SALARY_HANDLER,
+                    (ResultSet rs, Salary s) -> s, salary);
+            } catch (PSQLException e) {
+                salary1 = findSalary(salary);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
             return salary1;
         }
 
         private Salary findSalary(BigDecimal title) {
-            Salary salary = null;
-            try {
-                PreparedStatement preparedStatement = connection.prepareStatement("select id as salary_id, value as salary_value from salary where value = ?");
-                preparedStatement.setBigDecimal(1, title);
+            String sqlSalary = "select id as salary_id, value as salary_value from salary where value = ?";
 
-                ResultSet resultSet = preparedStatement.executeQuery();
-                while (resultSet.next()) {
-                    salary = salaryRowMapper.mapRow(resultSet);
-                }
+            try {
+                return JdbcTemplate.select(connection, sqlSalary, UtilsHandler.ONE_SALARY_HANDLER,
+                    (ResultSet rs, Salary s) -> s, title);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-            return salary;
         }
 
         private Salary findSalary(Long id) {
-            Salary salary = null;
-            try {
-                PreparedStatement preparedStatement = connection.prepareStatement("select id as salary_id, value as salary_value from salary where id = ?");
-                preparedStatement.setLong(1, id);
+            String sqlSalary = "select id as salary_id, value as salary_value from salary where id = ?";
 
-                ResultSet resultSet = preparedStatement.executeQuery();
-                while (resultSet.next()) {
-                    salary = salaryRowMapper.mapRow(resultSet);
-                }
+            Salary salary;
+            try {
+                salary = JdbcTemplate.select(connection, sqlSalary, UtilsHandler.ONE_SALARY_HANDLER,
+                    (ResultSet rs, Salary s) -> s, id);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -199,72 +153,58 @@ public class PersistentStorage implements StorageService {
         }
 
         public Organization addOrganization(String title) {
-            Organization organization = null;
+            String insertOrganizationSql =
+                "insert into organizations(title) values(?) returning id as org_id, title as org_title";
+
+            Organization organization;
             try {
-                String insertAndGetValues = "insert into organizations(title) values(?) returning id as org_id, title as org_title";
-                PreparedStatement addOrganization = connection.prepareStatement(insertAndGetValues,
-                    Statement.RETURN_GENERATED_KEYS);
-
-                addOrganization.setString(1, title);
-
-                try {
-                    addOrganization.execute();
-                    ResultSet resultSetOrg = addOrganization.getGeneratedKeys();
-                    while (resultSetOrg.next()) {
-                        organization = organizationRowMapper.mapRow(resultSetOrg);
-                    }
-                } catch (PSQLException e) {
-                    organization = findOrganization(title);
-                }
-
+                organization =
+                    JdbcTemplate.insert(connection, insertOrganizationSql, UtilsHandler.ONE_ORGANIZATION_HANDLER,
+                        (ResultSet rs, Organization o) -> o, title);
+            } catch (PSQLException e) {
+                organization = findOrganization(title);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
             return organization;
         }
 
-        public Organization findOrganization(final String title) throws SQLException {
-            PreparedStatement preparedStatement =
-                connection.prepareStatement("select id as org_id, title as org_title from organizations where title = ? ");
-            preparedStatement.setString(1, title);
+        public Organization findOrganization(final String title) {
 
-            PreparedStatement preparedStatementEmployees =
-                connection.prepareStatement("select id as empl_id, ename as empl_title, salary_id from employees where org_id = ? ");
-            ResultSet resultSet = preparedStatement.executeQuery();
+            String sqlSelectOrg = "select id as org_id, title as org_title from organizations where title = ? ";
 
-            Organization org = null;
-            while (resultSet.next()) {
-                org = organizationRowMapper.mapRow(resultSet);
+            String sqlSelectEmpl =
+                "select id as empl_id, ename as empl_title, salary_id from employees where org_id = ? ";
 
-                preparedStatementEmployees.setLong(1, resultSet.getLong("org_id"));
-                ResultSet rs = preparedStatementEmployees.executeQuery();
-                Set<Employee> employees = new HashSet<>();
-                while (rs.next()) {
-                    Employee employee = employeeRowMapper.mapRow(rs);
-                    Salary salary = findSalary(rs.getLong("salary_id"));
-                    employee.setSalary(salary);
-                    employees.add(employee);
-                }
-                org.setEmployees(employees);
+            Organization organization;
+            try {
+                Callback<Organization> cbOrg = (ResultSet rs, Organization org) -> {
+                    Set<Employee> sets =
+                        JdbcTemplate.select(connection, sqlSelectEmpl, UtilsHandler.SET_EMPLOYEES_HANDLER,
+                            callbackEmployee,
+                            rs.getLong("org_id"));
+                    org.setEmployees(sets);
+                    return org;
+                };
+                organization =
+                    JdbcTemplate.select(connection, sqlSelectOrg, UtilsHandler.ONE_ORGANIZATION_HANDLER, cbOrg,
+                        title);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
             }
-            return org;
+            return organization;
         }
 
         public Employee get(final String name) {
 
+            String sqlGetEmployee =
+                "select id as empl_id, ename as empl_title, salary_id from employees where ename = ? ";
+            Employee employee;
             try {
-                PreparedStatement preparedStatement =
-                    connection.prepareStatement("select id as empl_id, ename as empl_title, salary_id from employees where ename = ? ");
-                preparedStatement.setString(1, name);
-
-                ResultSet emplResult = preparedStatement.executeQuery();
-
-                Employee employee = null;
-                while (emplResult.next()) {
-                    employee = employeeRowMapper.mapRow(emplResult);
-                    Salary salary = findSalary(emplResult.getLong("salary_id"));
-                    employee.setSalary(salary);
-                }
+                employee =
+                    JdbcTemplate.select(connection, sqlGetEmployee, UtilsHandler.ONE_EMPLOYEE_HANDLER, callbackEmployee,
+                        name);
                 return employee;
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -274,11 +214,9 @@ public class PersistentStorage implements StorageService {
         public Employee delete(final String name) {
 
             try {
-
                 Employee employee = get(name);
-                PreparedStatement stmt = connection.prepareStatement("delete from employees where ename = ?");
-                stmt.setString(1, name);
-                if (stmt.executeUpdate() >= 1) {
+                int result = JdbcTemplate.update(connection, "delete from employees where ename=?", name);
+                if (result >= 1) {
                     return employee;
                 } else {
                     System.out.println("Не получилось удалить работника " + employee);
@@ -290,31 +228,22 @@ public class PersistentStorage implements StorageService {
         }
 
         public Employee update(Employee newEmpl) {
-
-            String sql = "UPDATE employees SET ename=?, salary_id=?  WHERE id=?";
-
-
-            Employee employee;
+            Employee employee = null;
             try {
-
                 Salary salary = addSalary(newEmpl.getSalary().getValue());
 
+                int result = JdbcTemplate.update(connection, "UPDATE employees SET ename=?, salary_id=?  WHERE id=?",
+                    newEmpl.getName(), salary.getId(), newEmpl.getId());
 
-                PreparedStatement stmt = connection.prepareStatement(sql);
-                stmt.setString(1, newEmpl.getName());
-                stmt.setLong(2, salary.getId());
-
-                stmt.setLong(3, newEmpl.getId());
-                if (stmt.executeUpdate() >= 1) {
+                if (result >= 1) {
                     employee = get(newEmpl.getName());
-                    return employee;
                 } else {
                     System.out.println("Не получилось обновить работника " + newEmpl);
-                    return new Employee();
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+            return employee;
         }
     }
 }

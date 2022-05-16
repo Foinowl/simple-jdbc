@@ -11,6 +11,15 @@ import org.example.db.model.Organization;
  * 1. InmemoryStorageService - для хранения данных в оперативной памяти (в Map)
  * 2. PersistentStorage - для хранения данных в базе данных
  */
+
+/*
+    * Можно разбить данный интерфейс на несколько.
+    * Сделать общий интерфейс для круд операций, параметризированный по классу из package model
+    * Далее от общего интерфейса можно наследоваться и дополнять новыми действиями.
+    * 1. DAO - интерфейс(get, delete, update, create)
+    * 2. OrganizationDao - наследуется от DAO. Любые классы имплементирующие данный интерфейс
+    * могут использовать разными хранилищами данными.
+* */
 public interface StorageService {
 
     Organization findOrganization(String title);
