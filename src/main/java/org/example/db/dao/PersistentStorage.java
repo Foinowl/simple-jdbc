@@ -9,6 +9,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
 import java.util.Set;
+import org.example.db.mappers.EmployeeMapper;
+import org.example.db.mappers.OrganizationMapper;
+import org.example.db.mappers.RowMapper;
+import org.example.db.mappers.SalaryMapper;
 import org.example.db.model.Employee;
 import org.example.db.model.Organization;
 import org.example.db.model.Salary;
@@ -66,6 +70,12 @@ public class PersistentStorage implements StorageService {
     public static class TransactionWrapper {
         private static final TransactionWrapper instance = new TransactionWrapper();
 
+        private final RowMapper<Salary> salaryRowMapper = new SalaryMapper();
+
+        private final RowMapper<Organization> organizationRowMapper = new OrganizationMapper();
+
+        private final RowMapper<Employee> employeeRowMapper = new EmployeeMapper();
+
         private Connection connection;
 
         private TransactionWrapper() {
@@ -90,21 +100,22 @@ public class PersistentStorage implements StorageService {
 
             try {
                 PreparedStatement statement =
-                    connection.prepareStatement("select id, ename, salary_id, org_id from employees");
-                PreparedStatement statement1 = connection.prepareStatement("select id, value from salary where id = ?");
+                    connection.prepareStatement(
+                        "select id as empl_id, ename as empl_title, salary_id, org_id from employees");
+                PreparedStatement statement1 = connection.prepareStatement(
+                    "select id as salary_id, value as salary_value from salary where id = ?");
                 ResultSet resultSet = statement.executeQuery();
 
                 while (resultSet.next()) {
-                    Employee employee = new Employee();
-                    employee.setName(resultSet.getString("ename"));
-                    employee.setId(resultSet.getLong("id"));
-                    Long salaryId = resultSet.getLong("salary_id");
 
-                    Salary salary = new Salary();
-                    statement1.setLong(1, salaryId);
+                    Employee employee = employeeRowMapper.mapRow(resultSet);
+
+                    statement1.setLong(1, resultSet.getLong("salary_id"));
                     ResultSet salaryResultSet = statement1.executeQuery();
+
+                    Salary salary = null;
                     while (salaryResultSet.next()) {
-                        salary.setValue(salaryResultSet.getBigDecimal("value"));
+                        salary = salaryRowMapper.mapRow(salaryResultSet);
                     }
                     employee.setSalary(salary);
 
@@ -118,63 +129,120 @@ public class PersistentStorage implements StorageService {
         }
 
         public void add(String orgTitle, String emplName, BigDecimal empSalary) throws SQLException {
-            PreparedStatement addSalary = connection.prepareStatement("insert into salary(value) values(?)",
-                Statement.RETURN_GENERATED_KEYS);
-            PreparedStatement addOrganization =
-                connection.prepareStatement("insert into organizations(title) values(?)",
-                    Statement.RETURN_GENERATED_KEYS);
             PreparedStatement addEmployee =
                 connection.prepareStatement("insert into employees(ename, salary_id, org_id) values (?,?,?)",
                     Statement.RETURN_GENERATED_KEYS);
+            Salary salary = addSalary(empSalary);
 
-            addSalary.setLong(1, empSalary.longValueExact());
-            addSalary.execute();
-
-            Long salaryId = null;
-            ResultSet salaryIdSet = addSalary.getGeneratedKeys();
-            while (salaryIdSet.next()) {
-                salaryId = salaryIdSet.getLong("id");
-            }
-
-            addOrganization.setString(1, orgTitle);
-
-            Long orgId = null;
-            try{
-                addOrganization.execute();
-                ResultSet orgIdSet = addOrganization.getGeneratedKeys();
-                while (orgIdSet.next()) {
-                    orgId = orgIdSet.getLong("id");
-                }   
-            } catch (PSQLException e){
-                orgId = findOrganization(orgTitle).getId();
-            }
-
+            Organization organization = addOrganization(orgTitle);
             addEmployee.setString(1, emplName);
-            addEmployee.setLong(2, salaryId);
-            addEmployee.setLong(3, orgId);
+            addEmployee.setLong(2, salary.getId());
+            addEmployee.setLong(3, organization.getId());
 
             addEmployee.execute();
         }
 
+        private Salary addSalary(BigDecimal salary) {
+            Salary salary1 = null;
+            try {
+                PreparedStatement addSalary = connection.prepareStatement(
+                    "insert into salary(value) values(?) returning id as salary_id, value as salary_value",
+                    Statement.RETURN_GENERATED_KEYS);
+
+                addSalary.setBigDecimal(1, salary);
+
+                try {
+                    addSalary.execute();
+                    ResultSet resultSalary = addSalary.getGeneratedKeys();
+                    while (resultSalary.next()) {
+                        salary1 = salaryRowMapper.mapRow(resultSalary);
+                    }
+                } catch (PSQLException e) {
+                    salary1 = findSalary(salary);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            return salary1;
+        }
+
+        private Salary findSalary(BigDecimal title) {
+            Salary salary = null;
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement("select id as salary_id, value as salary_value from salary where value = ?");
+                preparedStatement.setBigDecimal(1, title);
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    salary = salaryRowMapper.mapRow(resultSet);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            return salary;
+        }
+
+        private Salary findSalary(Long id) {
+            Salary salary = null;
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement("select id as salary_id, value as salary_value from salary where id = ?");
+                preparedStatement.setLong(1, id);
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    salary = salaryRowMapper.mapRow(resultSet);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            return salary;
+        }
+
+        public Organization addOrganization(String title) {
+            Organization organization = null;
+            try {
+                String insertAndGetValues = "insert into organizations(title) values(?) returning id as org_id, title as org_title";
+                PreparedStatement addOrganization = connection.prepareStatement(insertAndGetValues,
+                    Statement.RETURN_GENERATED_KEYS);
+
+                addOrganization.setString(1, title);
+
+                try {
+                    addOrganization.execute();
+                    ResultSet resultSetOrg = addOrganization.getGeneratedKeys();
+                    while (resultSetOrg.next()) {
+                        organization = organizationRowMapper.mapRow(resultSetOrg);
+                    }
+                } catch (PSQLException e) {
+                    organization = findOrganization(title);
+                }
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            return organization;
+        }
+
         public Organization findOrganization(final String title) throws SQLException {
             PreparedStatement preparedStatement =
-                connection.prepareStatement("select id, title from organizations where title = ? ");
+                connection.prepareStatement("select id as org_id, title as org_title from organizations where title = ? ");
             preparedStatement.setString(1, title);
 
-            PreparedStatement preparedStatementEm =
-                connection.prepareStatement("select ename from employees where org_id = ? ");
+            PreparedStatement preparedStatementEmployees =
+                connection.prepareStatement("select id as empl_id, ename as empl_title, salary_id from employees where org_id = ? ");
             ResultSet resultSet = preparedStatement.executeQuery();
 
             Organization org = null;
             while (resultSet.next()) {
-                String name = resultSet.getString("title");
-                org = new Organization(name);
-                org.setId(resultSet.getLong("id"));
-                preparedStatementEm.setLong(1, resultSet.getLong("id"));
-                ResultSet rs = preparedStatementEm.executeQuery();
+                org = organizationRowMapper.mapRow(resultSet);
+
+                preparedStatementEmployees.setLong(1, resultSet.getLong("org_id"));
+                ResultSet rs = preparedStatementEmployees.executeQuery();
                 Set<Employee> employees = new HashSet<>();
                 while (rs.next()) {
-                    Employee employee = get(rs.getString("ename"));
+                    Employee employee = employeeRowMapper.mapRow(rs);
+                    Salary salary = findSalary(rs.getLong("salary_id"));
+                    employee.setSalary(salary);
                     employees.add(employee);
                 }
                 org.setEmployees(employees);
@@ -186,29 +254,15 @@ public class PersistentStorage implements StorageService {
 
             try {
                 PreparedStatement preparedStatement =
-                    connection.prepareStatement("select id, ename, salary_id from employees where ename = ? ");
+                    connection.prepareStatement("select id as empl_id, ename as empl_title, salary_id from employees where ename = ? ");
                 preparedStatement.setString(1, name);
-
-                PreparedStatement salaryStatement =
-                    connection.prepareStatement("select id, value from salary where id = ?");
 
                 ResultSet emplResult = preparedStatement.executeQuery();
 
-                Employee employee = new Employee();
+                Employee employee = null;
                 while (emplResult.next()) {
-                    String names = emplResult.getString("ename");
-                    long salaryId = emplResult.getLong("salary_id");
-
-                    employee.setName(names);
-                    employee.setId(emplResult.getLong("id"));
-                    salaryStatement.setLong(1, salaryId);
-                    ResultSet salaryRS = salaryStatement.executeQuery();
-                    BigDecimal bigDecimal = null;
-                    Salary salary = new Salary();
-                    while (salaryRS.next()) {
-                        salary.setValue(salaryRS.getBigDecimal("value"));
-                        salary.setId(salaryRS.getLong("id"));
-                    }
+                    employee = employeeRowMapper.mapRow(emplResult);
+                    Salary salary = findSalary(emplResult.getLong("salary_id"));
                     employee.setSalary(salary);
                 }
                 return employee;
@@ -242,16 +296,13 @@ public class PersistentStorage implements StorageService {
 
             Employee employee;
             try {
-                PreparedStatement addSalary = connection.prepareStatement("insert into salary(value) values(?)",
-                    Statement.RETURN_GENERATED_KEYS);
-                addSalary.setBigDecimal(1, newEmpl.getSalary().getValue());
 
-                addSalary.execute();
+                Salary salary = addSalary(newEmpl.getSalary().getValue());
+
 
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 stmt.setString(1, newEmpl.getName());
-                addSalary.getGeneratedKeys().next();
-                stmt.setLong(2, addSalary.getGeneratedKeys().getLong("id"));
+                stmt.setLong(2, salary.getId());
 
                 stmt.setLong(3, newEmpl.getId());
                 if (stmt.executeUpdate() >= 1) {

@@ -21,4 +21,12 @@ public class Salary {
   public void setId(final Long id) {
     this.id = id;
   }
+
+  @Override
+  public String toString() {
+    return "Salary{" +
+        "id=" + id +
+        ", value=" + value +
+        '}';
+  }
 }

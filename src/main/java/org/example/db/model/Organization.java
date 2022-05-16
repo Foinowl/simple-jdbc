@@ -11,6 +11,9 @@ public class Organization {
     this.title = title;
   }
 
+  public Organization() {
+  }
+
   private String title;
   private Set<Employee> employees = new HashSet<>();
 
@@ -48,6 +51,15 @@ public class Organization {
     }
     Organization that = (Organization) o;
     return Objects.equals(title, that.title);
+  }
+
+  @Override
+  public String toString() {
+    return "Organization{" +
+        "id=" + id +
+        ", title='" + title + '\'' +
+        ", employees=" + employees +
+        '}';
   }
 
   @Override
