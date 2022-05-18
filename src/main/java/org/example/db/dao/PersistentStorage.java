@@ -66,6 +66,10 @@ public class PersistentStorage implements StorageService {
             return employee;
         };
 
+/*        Можем вынести класс в отдельный класс, который будет подтягивать конф.настройки для бд
+          И составлять нужный урл для подключения бд.
+          Так же можно создать пул из всех соединений.
+        */
         private TransactionWrapper() {
             String url = "jdbc:postgresql://localhost:5433/postgres";
 
