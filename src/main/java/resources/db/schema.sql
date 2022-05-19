@@ -1,22 +1,22 @@
---drop table if exists organizations, salary, employees CASCADE;
+drop table if exists organizations, employees, employees CASCADE;
 
 create table organizations(
 	id bigserial,
-	title text unique ,
+	title text,
 
 	CONSTRAINT pk_organizations_id primary key(id)
 );
 
 create table salary (
 	id bigserial,
-	value bigint unique,
+	value bigint,
 
 	CONSTRAINT pk_salary_id primary key(id)
 );
 
 create table employees (
 	id bigserial,
-	ename text unique,
+	ename text,
 	salary_id bigint,
 	org_id bigint,
 

@@ -71,10 +71,10 @@ public class PersistentStorage implements StorageService {
           Так же можно создать пул из всех соединений.
         */
         private TransactionWrapper() {
-            String url = "jdbc:postgresql://localhost:5433/postgres";
+            String url = "jdbc:postgresql://localhost:5432/postgres";
 
             String user = "postgres";
-            String password = "admin";
+            String password = "postgres";
 
             try {
                 connection = DriverManager.getConnection(url, user, password);

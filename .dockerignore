@@ -1,0 +1,26 @@
+### игнорируем .git и .idea
+.git
+.idea
+
+### добавляем в игнор ВСЕ
+**/*
+
+### исключаем артефакты, требующиеся для создания контейнеров
+!**/wait-for-postgres.sh
+!**/entrypoint.sh
+!backend/commons/service-bus-dto/commons/build/libs/*
+!backend/services/core/services/build/libs/*
+!backend/services/excel/services/build/libs/*
+!backend/services/file-storage/services/build/libs/*
+!backend/services/webchat/services/build/libs/*
+!backend/services/monitoring/services/build/libs/*
+!backend/services/database/sql/*.sql
+!frontend/workspace/**/*
+!frontend/widget/**/*
+!frontend/bff/**/*
+!gulpfile.js
+
+### Повторно игнорируем Dockerfile, .git и .idea в сабмодулях
+**/Dockerfile
+**/.git
+**/.idea
