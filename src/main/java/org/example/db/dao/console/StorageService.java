@@ -1,4 +1,4 @@
-package org.example.db.dao;
+package org.example.db.dao.console;
 
 import java.util.Set;
 import org.example.db.model.Employee;

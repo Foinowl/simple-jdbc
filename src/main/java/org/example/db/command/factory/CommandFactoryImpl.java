@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import org.example.db.command.Command;
-import org.example.db.controller.AppContext;
+import org.example.db.controller.console.AppContext;
 import org.example.db.controller.Params;
-import org.example.db.dao.PersistentStorage;
-import org.example.db.dao.StorageService;
+import org.example.db.dao.console.PersistentStorage;
+import org.example.db.dao.console.StorageService;
 import org.example.db.model.Employee;
 import org.example.db.model.Organization;
 import org.example.db.model.Salary;
@@ -73,7 +73,7 @@ public class CommandFactoryImpl implements CommandFactory {
 
     public static class AddCommand implements Command {
 
-        public static final String NAME = "add";
+        public static final String NAME = "create_all";
 
         private final String orgName;
 
@@ -82,7 +82,6 @@ public class CommandFactoryImpl implements CommandFactory {
         private final BigDecimal salary;
 
         private final StorageService storageService;
-
 
         public AddCommand(String orgName, String empName, BigDecimal salary,
                           StorageService storageService) {
@@ -128,7 +127,7 @@ public class CommandFactoryImpl implements CommandFactory {
 
     public static class ListCommand implements Command {
 
-        public static String NAME = "list";
+        public static String NAME = "get_organization_all";
 
         private final StorageService storageService;
 
@@ -153,7 +152,7 @@ public class CommandFactoryImpl implements CommandFactory {
     }
 
     public static class GetCommand implements Command {
-        public static String NAME = "get";
+        public static String NAME = "get_employee";
 
         private final String name;
 
@@ -179,7 +178,7 @@ public class CommandFactoryImpl implements CommandFactory {
     }
 
     public static class DeleteCommand implements Command {
-        public static String NAME = "delete";
+        public static String NAME = "delete_employee";
 
         private final String name;
 
@@ -205,7 +204,7 @@ public class CommandFactoryImpl implements CommandFactory {
     }
 
     public static class UpdateCommand implements Command {
-        public static String NAME = "update";
+        public static String NAME = "update_employee";
 
         private final Employee employee;
 
@@ -239,7 +238,7 @@ public class CommandFactoryImpl implements CommandFactory {
     }
 
     public static class FindCommand implements Command {
-        public static String NAME = "find";
+        public static String NAME = "get_organization";
 
         private final StorageService storageService;
 

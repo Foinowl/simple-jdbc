@@ -1,7 +1,8 @@
-package org.example.db.mappers;
+package org.example.db.mappers.console;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.example.db.mappers.RowMapper;
 import org.example.db.model.Employee;
 
 public class EmployeeMapper implements RowMapper<Employee> {

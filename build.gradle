@@ -5,8 +5,11 @@
  */
 
 plugins {
+    id 'java'
     id 'application'
     id 'maven-publish'
+    id 'war'
+    id "org.gretty" version "3.0.5"
 }
 
 repositories {
@@ -19,13 +22,13 @@ repositories {
 dependencies {
     implementation 'org.postgresql:postgresql:42.3.5'
     implementation 'log4j:log4j:1.2.17'
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.12.3"
     testImplementation 'junit:junit:4.11'
 }
 
-group = 'org.example'
-version = '1.0-SNAPSHOT'
-description = 'db'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+ext {
+    mainClass = "org.example.db.Runner"
+}
 
 application {
     mainClass = 'org.example.db.Runner'
@@ -38,6 +41,10 @@ publishing {
         }
     }
 }
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+description = 'db'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'

@@ -1,4 +1,4 @@
-package org.example.db.dao;
+package org.example.db.dao.console;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
+import org.example.db.dao.Callback;
 import org.example.db.model.Employee;
 import org.example.db.model.Organization;
 import org.example.db.model.Salary;

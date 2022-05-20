@@ -1,7 +1,7 @@
 package org.example.db;
 
-import org.example.db.controller.FrontController;
-import org.example.db.controller.SimpleConsoleController;
+import org.example.db.controller.console.FrontController;
+import org.example.db.controller.console.SimpleConsoleController;
 import org.example.db.view.SimpleConsoleView;
 
 // Не  стал добавлять доп.настроек для валидации данных на разных уровнях

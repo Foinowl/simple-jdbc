@@ -1,8 +1,9 @@
-package org.example.db.controller;
+package org.example.db.controller.console;
 
 import org.example.db.command.Command;
 import org.example.db.command.factory.CommandFactory;
 import org.example.db.command.factory.CommandFactoryImpl;
+import org.example.db.controller.Params;
 import org.example.db.view.ConsoleView;
 
 public class FrontController {
@@ -26,7 +27,7 @@ public class FrontController {
   }
 
   public void process() {
-    String newLine = null;
+    String newLine;
     while (!appContext.isExit()) {
       newLine = consoleView.nextLine();
       Params params = controller.parseCommandLine(newLine);
@@ -34,5 +35,4 @@ public class FrontController {
       command.execute();
     }
   }
-
 }

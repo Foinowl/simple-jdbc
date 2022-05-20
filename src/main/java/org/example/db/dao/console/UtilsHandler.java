@@ -1,11 +1,12 @@
-package org.example.db.dao;
+package org.example.db.dao.console;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.example.db.mappers.EmployeeMapper;
-import org.example.db.mappers.OrganizationMapper;
+import org.example.db.dao.ResultSetHandler;
+import org.example.db.mappers.console.EmployeeMapper;
+import org.example.db.mappers.console.OrganizationMapper;
 import org.example.db.mappers.RowMapper;
-import org.example.db.mappers.SalaryMapper;
+import org.example.db.mappers.console.SalaryMapper;
 import org.example.db.model.Employee;
 import org.example.db.model.Organization;
 import org.example.db.model.Salary;

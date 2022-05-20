@@ -1,11 +1,12 @@
-package org.example.db.dao;
+package org.example.db.dao.console;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.example.db.dao.Callback;
+import org.example.db.dao.ResultSetHandler;
 
-// Можно сделать класс абстрактным и классы использующие соединения через jdbc могут от него наследоваться.
 public class JdbcTemplate {
     public static <T, Y> T select(Connection c, String sql, ResultSetHandler<T, Y> resultSetHandler, Callback<Y> cb,
                                   Object... parameters) throws SQLException {

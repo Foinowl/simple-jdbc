@@ -1,4 +1,4 @@
-package org.example.db.controller;
+package org.example.db.controller.console;
 
 public class AppContext {
 
