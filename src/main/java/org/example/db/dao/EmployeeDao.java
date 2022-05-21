@@ -16,9 +16,11 @@ public class EmployeeDao extends TemplateExecutor<EmployeeEntity> implements DAO
 
     private final String sqlEmployeeSave = "insert into employees (ename, salary_id, org_id) values(?, ?, ?)";
 
-    private final String sqlEmployeeUpdate = "update employees set ename = ?, salary_id = ?, org_id = ?  where id = ?";
+    private final String sqlEmployeeUpdate = "update employees set salary_id = ?, org_id = ?  where ename = ?";
 
     private final String sqlEmployeeDelete = "delete from employees where id = ?";
+
+    private final String sqlEmployeeDeleteByName = "delete from employees where ename = ?";
 
     public EmployeeDao() {
         super(FactoryMapper.getInstance().getMapperEmployeeEntity());
@@ -33,14 +35,19 @@ public class EmployeeDao extends TemplateExecutor<EmployeeEntity> implements DAO
 
     @Override
     public long update(EmployeeEntity employeeEntity) {
-        return update(sqlEmployeeUpdate, employeeEntity.getName(), employeeEntity.getSalaryId(), employeeEntity.getOrgId(),
-            employeeEntity.getId());
+        return update(sqlEmployeeUpdate, employeeEntity.getSalaryId(), employeeEntity.getOrgId(),
+            employeeEntity.getName());
 
     }
 
     @Override
     public boolean delete(long id) {
         return delete(sqlEmployeeDelete, id);
+    }
+
+    @Override
+    public boolean delete(String name) {
+        return delete(sqlEmployeeDeleteByName, name);
     }
 
     @Override

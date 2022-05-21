@@ -8,7 +8,7 @@ import org.example.db.mappers.factory.FactoryMapper;
 public class SalaryDao extends TemplateExecutor<SalaryEntity> implements DAO<SalaryEntity> {
 
     private final String sqlSalaryFindById = "select id, value from salary where id = ?";
-    private final String sqlSalaryFindByValue = "select id, valie from salary where value = ?";
+    private final String sqlSalaryFindByValue = "select id, value from salary where value = ?";
 
     private final String sqlSalaryFindAll = "select id, value from salary";
 
@@ -35,6 +35,11 @@ public class SalaryDao extends TemplateExecutor<SalaryEntity> implements DAO<Sal
     @Override
     public boolean delete(long id) {
         return delete(sqlSalaryDelete, id);
+    }
+
+    @Override
+    public boolean delete(String name) {
+        return false;
     }
 
     @Override

@@ -5,7 +5,7 @@ import org.example.db.entity.OrganizationEntity;
 import org.example.db.mappers.factory.FactoryMapper;
 
 public class OrganizationDao extends TemplateExecutor<OrganizationEntity> implements DAO<OrganizationEntity> {
-    private final String sqlOrganizationFindById = "select id, title organizations salary where id = ?";
+    private final String sqlOrganizationFindById = "select id, title from organizations where id = ?";
 
     private final String sqlOrganizationFindByName = "select id, title from organizations where title = ?";
 
@@ -33,6 +33,11 @@ public class OrganizationDao extends TemplateExecutor<OrganizationEntity> implem
     @Override
     public boolean delete(long id) {
         return delete(sqlOrganizationDelete, id);
+    }
+
+    @Override
+    public boolean delete(String name) {
+        return false;
     }
 
     @Override

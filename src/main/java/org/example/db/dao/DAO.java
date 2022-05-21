@@ -10,6 +10,8 @@ public interface DAO<T> {
 
     boolean delete(long id);
 
+    boolean delete(String name);
+
     T findById(long id);
 
     List<T> findAll();
