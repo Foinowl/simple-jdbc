@@ -8,4 +8,11 @@ public class BasedCommand {
     public BasedCommand(Params params) {
         this.params = params;
     }
+
+    public BasedCommand() {
+    }
+
+    public void setParams(Params params) {
+        this.params = params;
+    }
 }

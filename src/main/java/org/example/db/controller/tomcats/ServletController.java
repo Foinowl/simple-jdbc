@@ -5,43 +5,50 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import org.apache.commons.lang3.StringUtils;
 import org.example.db.command.Command;
 import org.example.db.command.factory.ServletCommandFactory;
 import org.example.db.controller.Params;
-
-
-// TODO: Устранить повторение кода, объедить повторяемые действия в одну логику.
+import org.example.db.service.UtilsService;
 
 @WebServlet("/api/*")
 public class ServletController extends HttpServlet {
 
+    private final String digitalValue = "id";
+    private final String stringValue = "name";
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.getWriter().println(req.getContextPath());
 
+        process(req, resp);
+    }
 
-        String url = req.getPathInfo();
-        url = url.substring(url.lastIndexOf("/") + 1);
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        resp.getWriter().println(url);
-        resp.getWriter().println(req.getServletPath());
-        resp.getWriter().println(req.getMethod());
+        process(req, resp);
+    }
 
-        resp.getWriter().println(req.getRequestURL());
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        resp.getWriter().println(getCommandFromUrl(req));
+        process(req, resp);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        process(req, resp);
+    }
+
+    private void process(HttpServletRequest req, HttpServletResponse resp) {
         String urlCommand = getCommandFromUrl(req);
         Params params = createParamsWithName(urlCommand, req, resp);
         Command command = ServletCommandFactory.getInstance().buildCommand(params);
         command.execute();
     }
 
-    private Params createParamsWithName(String urlCommand, HttpServletRequest req, HttpServletResponse resp) {
-        return new ProxyParams(urlCommand, req, resp);
-    }
 
-
-//    Рассчитан на более простое использование rest api
+//    Рассчитан на более простое использование rest api.
 //    можно добавить парсер для разбора сложных урлов
 //    который будет отдавать шаблонный урл c готовым объектом params для конкретного CommandBuilder
 //    Example: GET /api/employee/14 -> /api/employee/{id} = GetEmployeeByIdBuilder --> GetEmployeeByIdCommand
@@ -49,7 +56,25 @@ public class ServletController extends HttpServlet {
     private String getCommandFromUrl(HttpServletRequest req) {
         StringBuilder sb = new StringBuilder();
         sb.append(req.getMethod());
-        sb.append(String.join("_", req.getPathInfo().replaceAll("\\d+", "id").split("/")));
+
+        String path = req.getPathInfo();
+        int start = path.indexOf(UtilsService.SLASH);
+        int end = path.lastIndexOf(UtilsService.SLASH);
+        if (end > start) {
+            String presentUrl = path.substring(start, end);
+            String lastValue = UtilsService.extractValueFromUrl(path);
+            if (StringUtils.isNumeric(lastValue)) {
+                lastValue = lastValue.replaceAll("\\d+", digitalValue);
+            } else if (!lastValue.isEmpty()){
+                lastValue = stringValue;
+            }
+            path = presentUrl + UtilsService.SLASH + lastValue;
+        }
+        sb.append(String.join("_", path.split(UtilsService.SLASH)));
         return sb.toString().toLowerCase();
+    }
+
+    private Params createParamsWithName(String urlCommand, HttpServletRequest req, HttpServletResponse resp) {
+        return new ProxyParams(urlCommand, req, resp);
     }
 }
