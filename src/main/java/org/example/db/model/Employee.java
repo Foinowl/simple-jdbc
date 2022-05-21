@@ -3,9 +3,10 @@ package org.example.db.model;
 public class Employee {
   private Long id;
 
-
   private String name;
   private Salary salary;
+
+  private Organization organization;
 
   public String getName() {
     return name;
@@ -29,6 +30,14 @@ public class Employee {
 
   public Long getId() {
     return id;
+  }
+
+  public Organization getOrganization() {
+    return organization;
+  }
+
+  public void setOrganization(Organization organization) {
+    this.organization = organization;
   }
 
   @Override

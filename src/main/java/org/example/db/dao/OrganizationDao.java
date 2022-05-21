@@ -7,6 +7,8 @@ import org.example.db.mappers.factory.FactoryMapper;
 public class OrganizationDao extends TemplateExecutor<OrganizationEntity> implements DAO<OrganizationEntity> {
     private final String sqlOrganizationFindById = "select id, title organizations salary where id = ?";
 
+    private final String sqlOrganizationFindByName = "select id, title from organizations where title = ?";
+
     private final String sqlOrganizationFindAll = "select id, title from organizations";
 
     private final String sqlOrganizationSave = "insert into organizations (title) values(?)";
@@ -24,8 +26,8 @@ public class OrganizationDao extends TemplateExecutor<OrganizationEntity> implem
     }
 
     @Override
-    public void update(OrganizationEntity organizationEntity) {
-        update(sqlOrganizationUpdate, organizationEntity.getTitle(), organizationEntity.getId());
+    public long update(OrganizationEntity organizationEntity) {
+        return update(sqlOrganizationUpdate, organizationEntity.getTitle(), organizationEntity.getId());
     }
 
     @Override
@@ -41,5 +43,9 @@ public class OrganizationDao extends TemplateExecutor<OrganizationEntity> implem
     @Override
     public List<OrganizationEntity> findAll() {
         return select(sqlOrganizationFindAll);
+    }
+
+    public OrganizationEntity findByName(String name) {
+        return selectForEntity(sqlOrganizationFindByName, name).orElse(null);
     }
 }
