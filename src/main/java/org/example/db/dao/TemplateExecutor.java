@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.example.db.dao.connection.PoolConnections;
 import org.example.db.mappers.RowMapper;
 
 public class TemplateExecutor<T> {
@@ -19,7 +20,7 @@ public class TemplateExecutor<T> {
     }
 
     protected List<T> select(String sql,
-                          Object... parameters) {
+                             Object... parameters) {
         try (PreparedStatement ps = createStatement(sql, parameters); ResultSet rs = ps.executeQuery()) {
             return handleResultSet(rs);
         } catch (SQLException e) {
@@ -35,22 +36,6 @@ public class TemplateExecutor<T> {
 
         return Optional.of(items.get(0));
     }
-
-
-    protected long executeInsertQuery(String query, Object... params) {
-        long result = 0;
-        try (PreparedStatement statement = createStatement(query, params)) {
-            statement.executeUpdate();
-            ResultSet generatedKey = statement.getGeneratedKeys();
-            if (generatedKey.next()) {
-                result = generatedKey.getLong(1);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        return result;
-    }
-
 
     protected long insert(String sql, Object... parameters) {
         try (PreparedStatement ps = createStatement(sql, parameters)) {
@@ -73,18 +58,23 @@ public class TemplateExecutor<T> {
         }
     }
 
+    protected boolean delete(String sql, Object... parameters) {
+        try (PreparedStatement ps = createStatement(sql, parameters)) {
+            return ps.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
     private PreparedStatement createStatement(String sql, Object... parameters) {
 
         try {
-            //        get from pool connections
-            Connection connection = null;
-
-            PreparedStatement ps = null;
-            ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            Connection connection = PoolConnections.getInstance().getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             for (int i = 0; i < parameters.length; i++) {
                 ps.setObject(i + 1, parameters[i]);
             }
-//            remove used connection from pool
+            PoolConnections.getInstance().releaseConnection(connection);
             return ps;
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage(), e);

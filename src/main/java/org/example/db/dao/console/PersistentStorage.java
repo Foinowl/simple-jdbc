@@ -6,7 +6,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
-import org.example.db.dao.Callback;
 import org.example.db.model.Employee;
 import org.example.db.model.Organization;
 import org.example.db.model.Salary;
@@ -67,10 +66,6 @@ public class PersistentStorage implements StorageService {
             return employee;
         };
 
-/*        Можем вынести класс в отдельный класс, который будет подтягивать конф.настройки для бд
-          И составлять нужный урл для подключения бд.
-          Так же можно создать пул из всех соединений.
-        */
         private TransactionWrapper() {
             String url = "jdbc:postgresql://localhost:5432/postgres";
 

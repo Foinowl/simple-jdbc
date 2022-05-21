@@ -2,35 +2,46 @@ package org.example.db.dao;
 
 import java.util.List;
 import org.example.db.entity.SalaryEntity;
-import org.example.db.mappers.RowMapper;
+import org.example.db.mappers.factory.FactoryMapper;
 
-public class SalaryDao<T extends SalaryEntity> extends TemplateExecutor<T> implements DAO<T>{
-    public SalaryDao(RowMapper<T> rowMapper) {
-        super(rowMapper);
+public class SalaryDao extends TemplateExecutor<SalaryEntity> implements DAO<SalaryEntity> {
+
+    private final String sqlSalaryFindById = "select id, value from salary where id = ?";
+
+    private final String sqlSalaryFindAll = "select id, value from salary";
+
+    private final String sqlSalarySave = "insert into salary (value) values(?)";
+
+    private final String sqlSalaryUpdate = "update salary set value = ? where id = ?";
+
+    private final String sqlSalaryDelete = "delete from salary where id = ?";
+
+    public SalaryDao() {
+        super(FactoryMapper.getInstance().getMapperSalaryEntity());
     }
 
     @Override
     public long save(SalaryEntity salaryEntity) {
-        return 0;
+        return insert(sqlSalarySave, salaryEntity.getValue());
     }
 
     @Override
     public void update(SalaryEntity salaryEntity) {
-
+        update(sqlSalaryUpdate, salaryEntity.getValue(), salaryEntity.getId());
     }
 
     @Override
     public boolean delete(long id) {
-        return false;
+        return delete(sqlSalaryDelete, id);
     }
 
     @Override
-    public T findById(long id) {
-        return null;
+    public SalaryEntity findById(long id) {
+        return selectForEntity(sqlSalaryFindById, id).orElse(null);
     }
 
     @Override
-    public List<T> findAll() {
-        return null;
+    public List<SalaryEntity> findAll() {
+        return select(sqlSalaryFindAll);
     }
 }

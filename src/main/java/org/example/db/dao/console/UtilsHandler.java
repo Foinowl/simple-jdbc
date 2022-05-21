@@ -2,7 +2,6 @@ package org.example.db.dao.console;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.example.db.dao.ResultSetHandler;
 import org.example.db.mappers.console.EmployeeMapper;
 import org.example.db.mappers.console.OrganizationMapper;
 import org.example.db.mappers.RowMapper;

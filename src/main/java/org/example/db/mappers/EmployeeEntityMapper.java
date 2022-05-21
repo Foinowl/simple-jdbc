@@ -9,9 +9,9 @@ public class EmployeeEntityMapper implements RowMapper<EmployeeEntity>{
     public EmployeeEntity mapRow(ResultSet resultSet) throws SQLException {
         EmployeeEntity entity = new EmployeeEntity();
         entity.setId(resultSet.getLong("id"));
-        entity.setName(resultSet.getString("name"));
-        entity.setSalaryId(resultSet.getLong("salaryId"));
-        entity.setOrgId(resultSet.getLong("orgId"));
+        entity.setName(resultSet.getString("ename"));
+        entity.setSalaryId(resultSet.getLong("salary_id"));
+        entity.setOrgId(resultSet.getLong("org_id"));
         return entity;
     }
 }

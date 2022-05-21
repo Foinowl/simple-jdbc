@@ -4,8 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.example.db.dao.Callback;
-import org.example.db.dao.ResultSetHandler;
 
 public class JdbcTemplate {
     public static <T, Y> T select(Connection c, String sql, ResultSetHandler<T, Y> resultSetHandler, Callback<Y> cb,

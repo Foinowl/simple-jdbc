@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import org.example.db.entity.SalaryEntity;
 
 public class SalaryEntityMapper implements RowMapper<SalaryEntity>{
+
     @Override
     public SalaryEntity mapRow(ResultSet resultSet) throws SQLException {
         SalaryEntity entity = new SalaryEntity();

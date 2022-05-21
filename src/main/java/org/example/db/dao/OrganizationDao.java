@@ -2,36 +2,44 @@ package org.example.db.dao;
 
 import java.util.List;
 import org.example.db.entity.OrganizationEntity;
-import org.example.db.mappers.RowMapper;
+import org.example.db.mappers.factory.FactoryMapper;
 
-public class OrganizationDao<T extends OrganizationEntity> extends TemplateExecutor<T> implements DAO<T>{
+public class OrganizationDao extends TemplateExecutor<OrganizationEntity> implements DAO<OrganizationEntity> {
+    private final String sqlOrganizationFindById = "select id, title organizations salary where id = ?";
 
-    public OrganizationDao(RowMapper<T> rowMapper) {
-        super(rowMapper);
+    private final String sqlOrganizationFindAll = "select id, title from organizations";
+
+    private final String sqlOrganizationSave = "insert into organizations (title) values(?)";
+
+    private final String sqlOrganizationUpdate = "update organizations set title = ? where id = ?";
+
+    private final String sqlOrganizationDelete = "delete from organizations where id = ?";
+    public OrganizationDao() {
+        super(FactoryMapper.getInstance().getMapperOrganizationEntity());
     }
 
     @Override
     public long save(OrganizationEntity organizationEntity) {
-        return 0;
+        return insert(sqlOrganizationSave, organizationEntity.getTitle());
     }
 
     @Override
     public void update(OrganizationEntity organizationEntity) {
-
+        update(sqlOrganizationUpdate, organizationEntity.getTitle(), organizationEntity.getId());
     }
 
     @Override
     public boolean delete(long id) {
-        return false;
+        return delete(sqlOrganizationDelete, id);
     }
 
     @Override
-    public T findById(long id) {
-        return null;
+    public OrganizationEntity findById(long id) {
+        return selectForEntity(sqlOrganizationFindById, id).orElse(null);
     }
 
     @Override
-    public List<T> findAll() {
-        return null;
+    public List<OrganizationEntity> findAll() {
+        return select(sqlOrganizationFindAll);
     }
 }

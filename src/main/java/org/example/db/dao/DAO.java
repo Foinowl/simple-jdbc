@@ -2,7 +2,6 @@ package org.example.db.dao;
 
 import java.util.List;
 
-// TODO: Реализовать основые методы для реализации общего API из задания
 public interface DAO<T> {
 
     long save(T t);
