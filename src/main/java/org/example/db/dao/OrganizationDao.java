@@ -2,7 +2,7 @@ package org.example.db.dao;
 
 import java.util.List;
 import org.example.db.entity.OrganizationEntity;
-import org.example.db.mappers.factory.FactoryMapper;
+import org.example.db.mappers.FactoryMapper;
 
 public class OrganizationDao extends TemplateExecutor<OrganizationEntity> implements DAO<OrganizationEntity> {
     private final String sqlOrganizationFindById = "select id, title from organizations where id = ?";

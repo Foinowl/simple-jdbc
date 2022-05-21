@@ -3,7 +3,7 @@ package org.example.db.entity;
 import java.math.BigDecimal;
 
 public class SalaryEntity {
-    private long id;
+    private Long id;
 
     private BigDecimal value;
 
@@ -21,7 +21,7 @@ public class SalaryEntity {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

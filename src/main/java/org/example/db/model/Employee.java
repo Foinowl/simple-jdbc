@@ -1,11 +1,18 @@
 package org.example.db.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Employee {
   private Long id;
 
   private String name;
+
+  @JsonProperty("salary")
   private Salary salary;
 
+  @JsonProperty("organization")
   private Organization organization;
 
   public String getName() {
@@ -24,12 +31,12 @@ public class Employee {
     this.salary = salary;
   }
 
-  public void setId(final Long id) {
-    this.id = id;
-  }
-
   public Long getId() {
     return id;
+  }
+
+  public void setId(final Long id) {
+    this.id = id;
   }
 
   public Organization getOrganization() {
@@ -40,12 +47,14 @@ public class Employee {
     this.organization = organization;
   }
 
+
   @Override
   public String toString() {
     return "Employee{" +
         "id=" + id +
         ", name='" + name + '\'' +
         ", salary=" + salary +
+        ", organization=" + organization +
         '}';
   }
 }

@@ -1,9 +1,11 @@
 package org.example.db.model;
 
 import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Salary {
   private Long id;
+  @JsonProperty("value")
   private BigDecimal value;
 
   public BigDecimal getValue() {

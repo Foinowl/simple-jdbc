@@ -1,7 +1,7 @@
 package org.example.db.entity;
 
 public class EmployeeEntity {
-    private long id;
+    private Long id;
 
     private String name;
 
@@ -23,7 +23,7 @@ public class EmployeeEntity {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

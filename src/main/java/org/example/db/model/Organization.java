@@ -3,9 +3,13 @@ package org.example.db.model;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Organization {
   private Long id;
+
+  @JsonProperty("title")
+  private String title;
 
   public Organization(String title) {
     this.title = title;
@@ -14,12 +18,12 @@ public class Organization {
   public Organization() {
   }
 
-  private String title;
   private Set<Employee> employees = new HashSet<>();
 
   public String getTitle() {
     return title;
   }
+
 
   public void setTitle(String title) {
     this.title = title;

@@ -3,7 +3,7 @@ package org.example.db.dao;
 import java.math.BigDecimal;
 import java.util.List;
 import org.example.db.entity.SalaryEntity;
-import org.example.db.mappers.factory.FactoryMapper;
+import org.example.db.mappers.FactoryMapper;
 
 public class SalaryDao extends TemplateExecutor<SalaryEntity> implements DAO<SalaryEntity> {
 

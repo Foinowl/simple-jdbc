@@ -20,7 +20,7 @@ public class EmployeeConverter implements ConvertService<EmployeeEntity, Employe
         Employee model = new Employee();
         model.setId(employeeEntity.getId());
         model.setName(employeeEntity.getName());
-        model.setSalary(salaryService.findById(employeeEntity.getId()));
+        model.setSalary(salaryService.findById(employeeEntity.getSalaryId()));
         model.setOrganization(organizationService.findById(employeeEntity.getOrgId()));
         return model;
     }

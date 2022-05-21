@@ -2,7 +2,7 @@ package org.example.db.dao;
 
 import java.util.List;
 import org.example.db.entity.EmployeeEntity;
-import org.example.db.mappers.factory.FactoryMapper;
+import org.example.db.mappers.FactoryMapper;
 
 public class EmployeeDao extends TemplateExecutor<EmployeeEntity> implements DAO<EmployeeEntity> {
 

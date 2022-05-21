@@ -8,19 +8,33 @@ import org.example.db.entity.EmployeeEntity;
 import org.example.db.model.Employee;
 import org.example.db.service.ConvertService;
 import org.example.db.service.EmployeeService;
+import org.example.db.service.ServiceFactory;
 import org.example.db.service.convert.EmployeeConverter;
 
 public class EmployeeServiceImpl implements EmployeeService<Employee> {
     private final ConvertService<EmployeeEntity, Employee> convertService = new EmployeeConverter();
 
     private final EmployeeDao employeeDao = RepositoryFactory.getInstance().getEmployeeDao();
+
     @Override
     public long create(Employee employee) {
-       return employeeDao.save(convertService.convertToEntity(employee));
+        employee.getSalary().setId(ServiceFactory.getInstance().getSalaryService().create(employee.getSalary()));
+
+        employee.getOrganization()
+            .setId(ServiceFactory.getInstance().getOrganizationService().create(employee.getOrganization()));
+
+        return employeeDao.save(convertService.convertToEntity(employee));
     }
 
     @Override
     public long update(Employee employee) {
+
+
+        employee.getSalary().setId(ServiceFactory.getInstance().getSalaryService().create(employee.getSalary()));
+
+        employee.getOrganization()
+            .setId(ServiceFactory.getInstance().getOrganizationService().create(employee.getOrganization()));
+
         return employeeDao.update(convertService.convertToEntity(employee));
     }
 
@@ -43,4 +57,10 @@ public class EmployeeServiceImpl implements EmployeeService<Employee> {
     public boolean delete(Employee employee) {
         return employeeDao.delete(employee.getId());
     }
+
+    @Override
+    public boolean delete(String name) {
+        return employeeDao.delete(name);
+    }
 }
+

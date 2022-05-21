@@ -1,4 +1,4 @@
-package org.example.db.mappers.factory;
+package org.example.db.mappers;
 
 import org.example.db.entity.EmployeeEntity;
 import org.example.db.entity.OrganizationEntity;

@@ -14,4 +14,6 @@ public interface EmployeeService<T> {
     List<T> findAll();
 
     boolean delete(T t);
+
+    boolean delete(String name);
 }

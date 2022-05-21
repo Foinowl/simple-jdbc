@@ -1,5 +1,6 @@
 package org.example.db.service.impl;
 
+import java.math.BigDecimal;
 import org.example.db.dao.RepositoryFactory;
 import org.example.db.dao.SalaryDao;
 import org.example.db.entity.SalaryEntity;
@@ -30,5 +31,10 @@ public class SalaryServiceImpl implements SalaryService<Salary> {
     @Override
     public Salary findById(long id) {
         return convertService.convertToModel(salaryDao.findById(id));
+    }
+
+    @Override
+    public Salary findByValue(BigDecimal value) {
+        return convertService.convertToModel(salaryDao.findByValue(value));
     }
 }
