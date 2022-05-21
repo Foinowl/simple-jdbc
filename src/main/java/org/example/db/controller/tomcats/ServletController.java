@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.example.db.command.Command;
-import org.example.db.command.factory.ServletCommandFactory;
+import org.example.db.command.impl.servlet.ServletCommandFactory;
 import org.example.db.controller.Params;
 import org.example.db.service.UtilsService;
 
@@ -16,6 +16,9 @@ public class ServletController extends HttpServlet {
 
     private final String digitalValue = "id";
     private final String stringValue = "name";
+
+    private final String ALL = "all";
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
@@ -48,7 +51,7 @@ public class ServletController extends HttpServlet {
     }
 
 
-//    Рассчитан на более простое использование rest api.
+    //    Рассчитан на более простое использование rest api.
 //    можно добавить парсер для разбора сложных урлов
 //    который будет отдавать шаблонный урл c готовым объектом params для конкретного CommandBuilder
 //    Example: GET /api/employee/14 -> /api/employee/{id} = GetEmployeeByIdBuilder --> GetEmployeeByIdCommand
@@ -65,7 +68,7 @@ public class ServletController extends HttpServlet {
             String lastValue = UtilsService.extractValueFromUrl(path);
             if (StringUtils.isNumeric(lastValue)) {
                 lastValue = lastValue.replaceAll("\\d+", digitalValue);
-            } else if (!lastValue.isEmpty()){
+            } else if (!lastValue.isEmpty() && !lastValue.equals(ALL)){
                 lastValue = stringValue;
             }
             path = presentUrl + UtilsService.SLASH + lastValue;
