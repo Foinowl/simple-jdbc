@@ -1,9 +1,9 @@
-package org.example.db.command.factory;
+package org.example.db.command.impl.console;
 
 import java.util.HashMap;
 import java.util.Map;
 import org.example.db.command.Command;
-import org.example.db.controller.Params;
+import org.example.db.command.CommandBuilder;
 
 public class BasedCommandFactory  {
 

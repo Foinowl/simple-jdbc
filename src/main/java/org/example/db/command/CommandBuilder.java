@@ -1,4 +1,4 @@
-package org.example.db.command.factory;
+package org.example.db.command;
 
 
 import org.example.db.command.Command;
