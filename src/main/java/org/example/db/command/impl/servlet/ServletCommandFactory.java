@@ -56,7 +56,7 @@ public class ServletCommandFactory extends BasedCommandFactory implements Comman
     }
 
     public static class AddEmployeeCommand extends BasedCommand implements Command {
-        public static String NAME = "post_employee";
+        public static String NAME = "post_employees";
 
         @Override
         public void execute() {
@@ -73,7 +73,7 @@ public class ServletCommandFactory extends BasedCommandFactory implements Comman
     }
 
     public static class UpdateEmployeeCommand extends BasedCommand implements Command {
-        public static String NAME = "put_employee";
+        public static String NAME = "put_employees";
 
         @Override
         public void execute() {
@@ -89,7 +89,7 @@ public class ServletCommandFactory extends BasedCommandFactory implements Comman
     }
 
     public static class AddOrganizationCommand extends BasedCommand implements Command {
-        public static String NAME = "post_organization";
+        public static String NAME = "post_organizations";
 
         @Override
         public void execute() {
@@ -105,7 +105,7 @@ public class ServletCommandFactory extends BasedCommandFactory implements Comman
     }
 
     public static class GetOrganizationCommand extends BasedCommand implements Command {
-        public static String NAME = "get_organization_id";
+        public static String NAME = "get_organizations_id";
 
         @Override
         public void execute() {
@@ -124,7 +124,7 @@ public class ServletCommandFactory extends BasedCommandFactory implements Comman
     }
 
     public static class GetOrganizationAllCommand extends BasedCommand implements Command {
-        public static String NAME = "get_organization_all";
+        public static String NAME = "get_organizations_all";
 
         @Override
         public void execute() {
@@ -145,7 +145,7 @@ public class ServletCommandFactory extends BasedCommandFactory implements Comman
 
     public static class GetEmployeeByIdCommand extends BasedCommand implements Command {
 
-        public static String NAME = "get_employee_id";
+        public static String NAME = "get_employees_id";
 
 
         @Override
@@ -164,7 +164,7 @@ public class ServletCommandFactory extends BasedCommandFactory implements Comman
 
     public static class GetEmployeeByNameCommand extends BasedCommand implements Command {
 
-        public static String NAME = "get_employee_name";
+        public static String NAME = "get_employees_name";
 
         @Override
         public void execute() {
@@ -181,7 +181,7 @@ public class ServletCommandFactory extends BasedCommandFactory implements Comman
     }
 
     public static class GetEmployeeAllCommand extends BasedCommand implements Command {
-        public static String NAME = "get_employee_all";
+        public static String NAME = "get_employees_all";
 
         @Override
         public void execute() {
@@ -200,7 +200,7 @@ public class ServletCommandFactory extends BasedCommandFactory implements Comman
 
     public static class DeleteEmployeeByNameCommand extends BasedCommand implements Command {
 
-        public static String NAME = "delete_employee_name";
+        public static String NAME = "delete_employees_name";
 
         @Override
         public void execute() {
