@@ -13,6 +13,10 @@ import org.example.db.model.Employee;
 import org.example.db.model.Organization;
 import org.example.db.model.Salary;
 
+
+/*
+* Класс с прошлой ДЗ, использующий старый api уровня DAO.
+* */
 public class CommandFactoryImpl extends BasedCommandFactory implements CommandFactory {
 
     private static final CommandFactory instance = new CommandFactoryImpl();

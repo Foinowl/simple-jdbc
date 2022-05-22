@@ -29,8 +29,6 @@ public class ServletCommandFactory extends BasedCommandFactory implements Comman
 
     private static final JsonService jsonService = ServiceFactory.getInstance().getJsonService();
 
-    private static final ObjectMapper mapper = new ObjectMapper();
-
     private static final OrganizationService<Organization> organizationService =
         ServiceFactory.getInstance().getOrganizationService();
 
