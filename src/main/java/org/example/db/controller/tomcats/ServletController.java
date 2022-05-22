@@ -5,6 +5,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.example.db.command.Command;
 import org.example.db.command.impl.servlet.ServletCommandFactory;
@@ -16,9 +18,12 @@ import org.example.db.service.UtilsService;
 public class ServletController extends HttpServlet {
 
     private final String digitalValue = "id";
+
     private final String stringValue = "name";
 
     private final String ALL = "all";
+
+    private final String ALLOWED_METHODS = "GET DELETE";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -64,20 +69,25 @@ public class ServletController extends HttpServlet {
         String path = req.getPathInfo();
         int start = path.indexOf(UtilsService.SLASH);
         int end = path.lastIndexOf(UtilsService.SLASH);
-        if (end > start) {
+        if (end > start && allowedMethods(req.getMethod())) {
             String presentUrl = path.substring(start, end);
             String lastValue = UtilsService.extractValueFromUrl(path);
             if (StringUtils.isNumeric(lastValue)) {
                 lastValue = lastValue.replaceAll("\\d+", digitalValue);
-            } else if (lastValue.isEmpty()){
+            } else if (lastValue.isEmpty()) {
                 lastValue = ALL;
-            }else if (!ALL.equals(lastValue)){
+            } else if (!ALL.equals(lastValue)) {
                 lastValue = stringValue;
             }
             path = presentUrl + UtilsService.SLASH + lastValue;
         }
         sb.append(String.join("_", path.split(UtilsService.SLASH)));
         return sb.toString().toLowerCase();
+    }
+
+    private boolean allowedMethods(String method) {
+        Optional<String> streams = Arrays.stream(ALLOWED_METHODS.split(" ")).filter(method::equals).findFirst();
+        return streams.isPresent();
     }
 
     private Params createParamsWithName(String urlCommand, HttpServletRequest req, HttpServletResponse resp) {

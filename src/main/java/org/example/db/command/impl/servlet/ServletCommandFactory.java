@@ -236,8 +236,7 @@ public class ServletCommandFactory extends BasedCommandFactory implements Comman
         public void execute() {
             try {
                 Writer writer = ((ProxyParams) params).getResponse().getWriter();
-                jsonService.writeToJsonObjects("\"status\":" + "unknown command", writer);
-                ((ProxyParams) params).getResponse().getWriter().println("UnknownCommand");
+                jsonService.writeToJsonObjects("\"status\":" + "unknown command: " + params.getCommandName(), writer);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
