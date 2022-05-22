@@ -1,4 +1,4 @@
-package org.example.db.controller;
+package org.example.db.controller.model;
 
 public class Params {
   private String commandName;

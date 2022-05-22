@@ -1,4 +1,4 @@
-package org.example.db.command.impl.console;
+package org.example.db.command.impl;
 
 import java.util.HashMap;
 import java.util.Map;

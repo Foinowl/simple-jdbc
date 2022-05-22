@@ -1,8 +1,7 @@
 package org.example.db.command;
 
 
-import org.example.db.command.Command;
-import org.example.db.controller.Params;
+import org.example.db.controller.model.Params;
 
 /**
  * Интерфейс для создания экземпляра объекта команда (класс, реализующий интерфейс Command).

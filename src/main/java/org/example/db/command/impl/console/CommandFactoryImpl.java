@@ -1,22 +1,21 @@
-package org.example.db.command.factory;
+package org.example.db.command.impl.console;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 import org.example.db.command.Command;
+import org.example.db.command.CommandBuilder;
+import org.example.db.command.CommandFactory;
+import org.example.db.command.impl.BasedCommandFactory;
+import org.example.db.controller.model.Params;
 import org.example.db.controller.console.AppContext;
-import org.example.db.controller.Params;
 import org.example.db.dao.console.PersistentStorage;
 import org.example.db.dao.console.StorageService;
 import org.example.db.model.Employee;
 import org.example.db.model.Organization;
 import org.example.db.model.Salary;
 
-public class CommandFactoryImpl implements CommandFactory {
+public class CommandFactoryImpl extends BasedCommandFactory implements CommandFactory {
 
     private static final CommandFactory instance = new CommandFactoryImpl();
-
-    private final Map<String, CommandBuilder> registar = new HashMap<>();
 
     public CommandFactoryImpl() {
         register(ExitCommand.NAME, new ExitCommandBuilder());
@@ -30,10 +29,6 @@ public class CommandFactoryImpl implements CommandFactory {
 
     public static CommandFactory getInstance() {
         return instance;
-    }
-
-    private void register(String commandName, CommandBuilder commandBuilder) {
-        registar.put(commandName, commandBuilder);
     }
 
     @Override

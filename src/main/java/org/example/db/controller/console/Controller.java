@@ -1,6 +1,6 @@
 package org.example.db.controller.console;
 
-import org.example.db.controller.Params;
+import org.example.db.controller.model.Params;
 
 /**
  * Интерфейс для преобразования строки в объект параметры.

@@ -1,7 +1,7 @@
 package org.example.db.controller.console;
 
 import java.util.Arrays;
-import org.example.db.controller.Params;
+import org.example.db.controller.model.Params;
 
 public class SimpleConsoleController implements Controller {
 

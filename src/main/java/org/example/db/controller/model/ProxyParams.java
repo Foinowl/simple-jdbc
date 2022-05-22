@@ -1,8 +1,8 @@
-package org.example.db.controller.tomcats;
+package org.example.db.controller.model;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.example.db.controller.Params;
+import org.example.db.controller.model.Params;
 
 public class ProxyParams extends Params {
 

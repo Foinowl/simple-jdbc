@@ -8,7 +8,8 @@ import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.example.db.command.Command;
 import org.example.db.command.impl.servlet.ServletCommandFactory;
-import org.example.db.controller.Params;
+import org.example.db.controller.model.Params;
+import org.example.db.controller.model.ProxyParams;
 import org.example.db.service.UtilsService;
 
 @WebServlet("/api/*")
