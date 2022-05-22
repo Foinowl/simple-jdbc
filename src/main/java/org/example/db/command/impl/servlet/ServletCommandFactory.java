@@ -64,8 +64,12 @@ public class ServletCommandFactory extends BasedCommandFactory implements Comman
                 Employee employee =
                     (Employee) jsonService.readObjectJson(((ProxyParams) params).getRequest().getInputStream(),
                         Employee.class);
-                long savedOrg = employeeService.create(employee);
-                ((ProxyParams) params).getResponse().getWriter().println("{\"status\":" + savedOrg + "}");
+                long id = employeeService.create(employee);
+                if (id >= 1) {
+                    ((ProxyParams) params).getResponse().setStatus(HttpServletResponse.SC_CREATED);
+                } else {
+                    ((ProxyParams) params).getResponse().setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -81,7 +85,12 @@ public class ServletCommandFactory extends BasedCommandFactory implements Comman
                 Employee employee =
                     (Employee) jsonService.readObjectJson(((ProxyParams) params).getRequest().getInputStream(),
                         Employee.class);
-                employeeService.update(employee);
+                long count = employeeService.update(employee);
+                if (count >= 1) {
+                    ((ProxyParams) params).getResponse().setStatus(HttpServletResponse.SC_ACCEPTED);
+                } else {
+                    ((ProxyParams) params).getResponse().setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -97,7 +106,12 @@ public class ServletCommandFactory extends BasedCommandFactory implements Comman
                 Organization organization =
                     (Organization) jsonService.readObjectJson(((ProxyParams) params).getRequest().getInputStream(),
                         Organization.class);
-                organizationService.create(organization);
+                long id = organizationService.create(organization);
+                if (id >= 1) {
+                    ((ProxyParams) params).getResponse().setStatus(HttpServletResponse.SC_CREATED);
+                } else {
+                    ((ProxyParams) params).getResponse().setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
