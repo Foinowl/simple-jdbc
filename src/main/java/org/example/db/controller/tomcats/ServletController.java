@@ -69,7 +69,9 @@ public class ServletController extends HttpServlet {
             String lastValue = UtilsService.extractValueFromUrl(path);
             if (StringUtils.isNumeric(lastValue)) {
                 lastValue = lastValue.replaceAll("\\d+", digitalValue);
-            } else if (!lastValue.isEmpty() && !lastValue.equals(ALL)){
+            } else if (lastValue.isEmpty()){
+                lastValue = ALL;
+            }else if (!ALL.equals(lastValue)){
                 lastValue = stringValue;
             }
             path = presentUrl + UtilsService.SLASH + lastValue;
